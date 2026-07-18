@@ -37,7 +37,7 @@ st.markdown("""
     .translation-sub {
         font-size: 0.9rem;
         color: #9ca3af;
-        font-style: italic;
+        font-style: normal;
     }
     .badge-pass {
         background-color: rgba(16, 185, 129, 0.15);
@@ -274,7 +274,7 @@ elif st.session_state.quiz_active and not st.session_state.submitted:
     # Display Question
     st.markdown(f"**{eng_q}**")
     if chi_q:
-        st.markdown(f"*(简中翻译：{chi_q})*")
+        st.markdown(f"(简中翻译：{chi_q})")
         
     st.write("---")
     
@@ -286,7 +286,7 @@ elif st.session_state.quiz_active and not st.session_state.submitted:
         eng_opt, chi_opt = parse_option_bilingual(q["options"][key])
         label = f"{key}. {eng_opt}"
         if chi_opt:
-            label += f" / *({chi_opt})*"
+            label += f" / ({chi_opt})"
         opt_labels.append(label)
         
     # Get previously selected option index
@@ -307,10 +307,13 @@ elif st.session_state.quiz_active and not st.session_state.submitted:
         selected_key = selected_option_label[0] # "A", "B", "C", or "D"
         st.session_state.user_answers[idx] = selected_key
         
+    # Check current answer (polled after radio selection updates st.session_state)
+    current_ans = st.session_state.user_answers.get(idx, None)
+    
     # Practice Mode Feedback Panel
-    if st.session_state.mode == "practice" and prev_ans:
+    if st.session_state.mode == "practice" and current_ans:
         st.write("")
-        is_correct = prev_ans == q["answer"]
+        is_correct = current_ans == q["answer"]
         if is_correct:
             st.success("🟢 答對了！ (Correct)")
         else:
@@ -321,7 +324,7 @@ elif st.session_state.quiz_active and not st.session_state.submitted:
         **💡 題目解析 (Explanation)：**
         {eng_exp}
         
-        *(简中翻译：{chi_exp})*
+        (简中翻译：{chi_exp})
         """)
         
     st.write("---")
@@ -444,7 +447,7 @@ elif st.session_state.submitted:
                 {"答對 (Correct)" if is_corr else "答錯 (Incorrect)"}
             </span><br/><br/>
             <strong>{eng_q}</strong><br/>
-            <span class='translation-sub'>*(简中翻译：{chi_q})*</span><br/><br/>
+            <span class='translation-sub'>(简中翻译：{chi_q})</span><br/><br/>
         </div>
         """, unsafe_allow_html=True)
         
@@ -457,13 +460,13 @@ elif st.session_state.submitted:
             elif key == u_a and not is_corr:
                 prefix = "❌ "
                 
-            st.write(f"{prefix}**{key}.** {eng_opt} / *({chi_opt})*")
+            st.write(f"{prefix}**{key}.** {eng_opt} / ({chi_opt})")
             
         st.markdown(f"""
         > **💡 解析 (Explanation)：**  
         > {eng_exp}  
         >   
-        > *(简中翻译：{chi_exp})*
+        > (简中翻译：{chi_exp})
         """)
         st.write("---")
         
